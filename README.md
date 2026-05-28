@@ -20,7 +20,7 @@ API REST para S-otify, una Single Page Application de música desarrollada con R
 | Recurso | URL |
 |---------|-----|
 | **Repositorio Frontend** | [github.com/bgastong/S-otify](https://github.com/bgastong/S-otify) |
-| **Tablero Kanban (Notion)** | [completar] |
+| **Tablero Kanban (Notion)** | [https://app.notion.com/p/36e62f87d28180acb56ee0a10df73360?v=36e62f87d28180198c0e000c2eef660d&source=copy_link] |
 | **Deploy Backend (Vercel)** | [completar] |
 | **Deploy Frontend** | [snotify.vercel.app](https://snotify.vercel.app) |
 
