@@ -4,18 +4,18 @@ API REST para S-otify, una Single Page Application de música desarrollada con R
 
 ---
 
-## 🧑‍💻 Integrantes
+## Integrantes
 
 | Nombre | Legajo | Rol |
 |--------|--------|-----|
-| Lucas Ortiz | [completar] | PM / Scrum Master |
+| Lucas Ortiz | [5561] | PM / Scrum Master |
 | Gaston Berhau | [completar] | Desarrollador |
 | Fabrizio Brollo | [completar] | Desarrollador |
 | Valentin Bustamante | [completar] | Desarrollador |
 
 ---
 
-## 🔗 Links
+## Links
 
 | Recurso | URL |
 |---------|-----|
@@ -26,7 +26,7 @@ API REST para S-otify, una Single Page Application de música desarrollada con R
 
 ---
 
-## 📱 Descripción de la aplicación
+## Descripción de la aplicación
 
 S-otify es una SPA de música inspirada en Spotify. Permite explorar un catálogo de canciones, buscar por nombre o artista, filtrar por género, ver el detalle de cada canción, gestionar favoritos y reproducir audio. La aplicación está desarrollada con React 19, Vite, React Router y Tailwind CSS.
 
@@ -34,7 +34,7 @@ Este repositorio contiene el **backend** que da soporte a la aplicación, implem
 
 ---
 
-## 🎵 Entidad principal: Song (Canción)
+## Entidad principal: Song (Canción)
 
 La entidad central del sistema es `Song`, que representa una canción en el catálogo.
 
