@@ -14,6 +14,9 @@ app.get("/error", (req, res, next) => {
   next(new Error("Forced error"));
 });
 
+
+
+
 app.use(notFound);
 app.use(errorHandler);
 
