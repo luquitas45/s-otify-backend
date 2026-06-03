@@ -14,7 +14,7 @@ const missing = required.filter((key) => !env[key]);
 
 if (missing.length > 0) {
   console.error(
-    `❌ Faltan variables de entorno requeridas: ${missing.join(", ")}`
+    `❌ Faltan variables de entorno requeridas: ${missing.join(", ")}`,
   );
   console.error("   Copiá .env.example a .env y completá los valores.");
   process.exit(1);
