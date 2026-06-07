@@ -21,4 +21,4 @@ function validateSong(song) {
     };
 }
 
-export default validateSong;
+module.exports = validateSong;

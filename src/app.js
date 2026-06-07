@@ -10,13 +10,6 @@ app.use(express.json());
 
 app.use("/api", route);
 
-app.get("/error", (req, res, next) => {
-  next(new Error("Forced error"));
-});
-
-
-
-
 app.use(notFound);
 app.use(errorHandler);
 
