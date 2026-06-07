@@ -66,7 +66,16 @@ const createSong = async (req, res, next) => {
       });
     }
 
-    const { name, artist, genre, youtubeId, audioUrl } = req.body;
+    const {
+  name,
+  artist,
+  genre,
+  youtubeId,
+  audioUrl,
+  image,
+  album,
+  duration,
+} = req.body;
 
     const existingSong = await prisma.song.findUnique({
       where: { youtubeId },
@@ -80,7 +89,16 @@ const createSong = async (req, res, next) => {
     }
 
     const song = await prisma.song.create({
-      data: { name, artist, genre, youtubeId, audioUrl },
+data: {
+  name,
+  artist,
+  genre,
+  youtubeId,
+  audioUrl,
+  image,
+  album,
+  duration,
+},
     });
 
     res.status(201).json({
@@ -103,7 +121,16 @@ const updateSong = async (req, res, next) => {
       });
     }
 
-    const { name, artist, genre, youtubeId, audioUrl } = req.body;
+    const {
+  name,
+  artist,
+  genre,
+  youtubeId,
+  audioUrl,
+  image,
+  album,
+  duration,
+} = req.body;
 
     const song = await prisma.song.findUnique({
       where: { id: parseInt(id) },
@@ -115,7 +142,16 @@ const updateSong = async (req, res, next) => {
 
     const updatedSong = await prisma.song.update({
       where: { id: parseInt(id) },
-      data: { name, artist, genre, youtubeId, audioUrl },
+      data: {
+        name,
+        artist,
+        genre,
+        youtubeId,
+        audioUrl,
+        image,
+        album,
+        duration,
+      },
     });
 
     res.status(200).json({
@@ -175,6 +211,13 @@ const validateSong = (body) => {
   if (!body.youtubeId || body.youtubeId.toString().trim() === "") {
     errors.push({ field: "youtubeId", message: "El ID de YouTube es obligatorio" });
   }
+
+  if (!body.image || body.image.toString().trim() === "") {
+  errors.push({
+    field: "image",
+    message: "La imagen es obligatoria",
+  });
+}
 
   if (!body.audioUrl || body.audioUrl.toString().trim() === "") {
     errors.push({ field: "audioUrl", message: "La URL de audio es obligatoria" });
