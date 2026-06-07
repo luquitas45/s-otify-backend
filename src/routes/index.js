@@ -1,10 +1,33 @@
 const express = require("express");
 const { getHealth } = require("../controllers/healthController");
-const { getSongs } = require("../controllers/songsController");
-const router = express.Router(); //Aca defino rutas
+const {
+  getSongs,
+  getSongById,
+  createSong,
+  updateSong,
+  deleteSong,
+} = require("../controllers/songsController");
+const {
+  checkFavorite,
+  addFavorite,
+  removeFavorite,
+  getFavorites,
+} = require("../controllers/favoritesController");
 
-router.get("/health", getHealth); //Cuando haya un GET a /healt ejecuto getHealth
+const router = express.Router();
+
+router.get("/health", getHealth);
 
 router.get("/songs", getSongs);
+router.post("/songs", createSong);
+router.get("/songs/:id", getSongById);
+router.put("/songs/:id", updateSong);
+router.delete("/songs/:id", deleteSong);
+
+router.get("/songs/:id/favorites", checkFavorite);
+router.post("/songs/:id/favorites", addFavorite);
+router.delete("/songs/:id/favorites", removeFavorite);
+
+router.get("/favorites", getFavorites);
 
 module.exports = router;
