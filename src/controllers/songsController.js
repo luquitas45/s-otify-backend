@@ -1,17 +1,235 @@
-const songs= [
-    { name: "Buenos Tiempos", artist: "Dillom", youtubeId: "kYvM-iR6FpQ", genre: "Trap", audioUrl: "https://res.cloudinary.com/doamuwxuq/video/upload/q_auto/f_auto/v1778124637/DILLOM_-_Buenos_tiempos_Videoclip_izatzc.mp3"},
-  { name: "Platos Rotos", artist: "Kamada", youtubeId: "H77O0u8Nq5g", genre: "Rap", audioUrl: "https://res.cloudinary.com/doamuwxuq/video/upload/q_auto/f_auto/v1778124637/Homer_el_Mero_Mero_-_Platos_Rotos_Video_Lyric_ij2top.mp3" },
-  { name: "Josear", artist: "Acru", youtubeId: "3u_xYVvWcUA", genre: "Rap", audioUrl: "https://res.cloudinary.com/doamuwxuq/video/upload/q_auto/f_auto/v1778124637/ACRU_-_JOSEAR_Video_Oficial_ffegx1.mp3" },
-  { name: "Guchi Polo", artist: "Saramalacara", youtubeId: "Gk6f7-t6YJ8", genre: "Trap", audioUrl: "https://res.cloudinary.com/doamuwxuq/video/upload/q_auto/f_auto/v1778124637/SARAMALACARA_-_GUCHI_POLO_Videoclip_Oficial_mvcedk.mp3"}
-];
+const prisma = require("../prisma/prismaClient");
 
-function getSongs(req, res) {
-    res.status(200).json({
-        status: "ok",
-        data: songs
+const getSongs = async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const pageSize = 20;
+    const skip = (page - 1) * pageSize;
+
+    const total = await prisma.song.count();
+    const songs = await prisma.song.findMany({
+      skip,
+      take: pageSize,
+      include: {
+        favorites: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
+
+    res.status(200).json({
+      status: "ok",
+      data: songs,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        hasMore: skip + pageSize < total,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getSongById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const song = await prisma.song.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        favorites: true,
+      },
+    });
+
+    if (!song) {
+      return res.status(404).json({ error: "Canción no encontrada" });
+    }
+
+    res.status(200).json({
+      status: "ok",
+      data: song,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createSong = async (req, res, next) => {
+  try {
+    const errors = validateSong(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: "Datos inválidos",
+        details: errors,
+      });
+    }
+
+    const {
+  name,
+  artist,
+  genre,
+  youtubeId,
+  audioUrl,
+  image,
+  album,
+  duration,
+} = req.body;
+
+    const existingSong = await prisma.song.findUnique({
+      where: { youtubeId },
+    });
+
+    if (existingSong) {
+      return res.status(400).json({
+        error: "Datos inválidos",
+        details: [{ field: "youtubeId", message: "Esta canción ya existe" }],
+      });
+    }
+
+    const song = await prisma.song.create({
+data: {
+  name,
+  artist,
+  genre,
+  youtubeId,
+  audioUrl,
+  image,
+  album,
+  duration,
+},
+    });
+
+    res.status(201).json({
+      status: "ok",
+      data: song,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateSong = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const errors = validateSong(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({
+        error: "Datos inválidos",
+        details: errors,
+      });
+    }
+
+    const {
+  name,
+  artist,
+  genre,
+  youtubeId,
+  audioUrl,
+  image,
+  album,
+  duration,
+} = req.body;
+
+    const song = await prisma.song.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!song) {
+      return res.status(404).json({ error: "Canción no encontrada" });
+    }
+
+    const updatedSong = await prisma.song.update({
+      where: { id: parseInt(id) },
+      data: {
+        name,
+        artist,
+        genre,
+        youtubeId,
+        audioUrl,
+        image,
+        album,
+        duration,
+      },
+    });
+
+    res.status(200).json({
+      status: "ok",
+      data: updatedSong,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteSong = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const song = await prisma.song.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!song) {
+      return res.status(404).json({ error: "Canción no encontrada" });
+    }
+
+    await prisma.song.delete({
+      where: { id: parseInt(id) },
+    });
+
+    res.status(200).json({
+      status: "ok",
+      message: "Canción eliminada",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const validateSong = (body) => {
+  const errors = [];
+
+  if (!body || typeof body !== "object") {
+    errors.push({ field: "body", message: "El body no puede estar vacío" });
+    return errors;
+  }
+
+  if (!body.name || body.name.toString().trim() === "") {
+    errors.push({ field: "name", message: "El nombre es obligatorio" });
+  }
+
+  if (!body.artist || body.artist.toString().trim() === "") {
+    errors.push({ field: "artist", message: "El artista es obligatorio" });
+  }
+
+  if (!body.genre || body.genre.toString().trim() === "") {
+    errors.push({ field: "genre", message: "El género es obligatorio" });
+  }
+
+  if (!body.youtubeId || body.youtubeId.toString().trim() === "") {
+    errors.push({ field: "youtubeId", message: "El ID de YouTube es obligatorio" });
+  }
+
+  if (!body.image || body.image.toString().trim() === "") {
+  errors.push({
+    field: "image",
+    message: "La imagen es obligatoria",
+  });
 }
 
+  if (!body.audioUrl || body.audioUrl.toString().trim() === "") {
+    errors.push({ field: "audioUrl", message: "La URL de audio es obligatoria" });
+  }
+
+  return errors;
+};
+
 module.exports = {
-    getSongs
+  getSongs,
+  getSongById,
+  createSong,
+  updateSong,
+  deleteSong,
 };
