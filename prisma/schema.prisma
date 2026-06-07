@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Song {
+  id        Int     @id @default(autoincrement())
+  name      String
+  artist    String
+  genre     String
+  youtubeId String  @unique
+  image     String
+  album     String  @default("Unknown Album")
+  duration  String  @default("0:00")
+  audioUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites FavoriteSong[]
+
+  @@index([genre])
+}
+
+model FavoriteSong {
+  id        Int     @id @default(autoincrement())
+  userId    String  @default("anonymous")
+  songId    Int
+  song      Song    @relation(fields: [songId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, songId])
+  @@index([userId])
+  @@index([songId])
+}
