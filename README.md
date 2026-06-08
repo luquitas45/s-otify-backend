@@ -21,7 +21,7 @@ API REST para S-otify, una Single Page Application de música desarrollada con R
 |---------|-----|
 | **Repositorio Frontend** | [github.com/bgastong/S-otify](https://github.com/bgastong/S-otify) |
 | **Tablero Kanban (Notion)** | [https://app.notion.com/p/36e62f87d28180acb56ee0a10df73360?v=36e62f87d28180198c0e000c2eef660d&source=copy_link] |
-| **Deploy Backend (Vercel)** | [completar] |
+| **Deploy Backend (Vercel)** | [s-otify-backend.vercel.app](https://s-otify-backend.vercel.app) |
 | **Deploy Frontend** | [snotify.vercel.app](https://snotify.vercel.app) |
 
 ---
@@ -77,7 +77,7 @@ La entidad central del sistema es `Song`, que representa una canción en el cat�
 ### 1. Clonar el repositorio
 
 ```bash
-git clone [completar-URL-del-repo]
+git clone https://github.com/luquitas45/s-otify-backend.git
 cd s-otify-backend
 ```
 
@@ -466,7 +466,7 @@ curl "http://localhost:3000/api/favorites?page=1"
 
 ## Deploy
 
-- **Backend**: Desplegado en [Vercel](https://vercel.com) — [completar-URL]
+- **Backend**: Desplegado en [Vercel](https://vercel.com) — [s-otify-backend.vercel.app](https://s-otify-backend.vercel.app)
 - **Base de datos**: [Neon](https://neon.tech) — PostgreSQL serverless
 - **Frontend**: [snotify.vercel.app](https://snotify.vercel.app)
 
