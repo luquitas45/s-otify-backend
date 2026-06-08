@@ -39,6 +39,9 @@ curl -X GET http://localhost:3000/api/songs
 # Página específica
 curl -X GET "http://localhost:3000/api/songs?page=2"
 
+# Buscar por nombre o artista
+curl -X GET "http://localhost:3000/api/songs?search=queen"
+
 # Página inexistente
 curl -X GET "http://localhost:3000/api/songs?page=999"
 ```
@@ -414,6 +417,7 @@ curl -X DELETE "http://localhost:3000/api/songs/1/favorites"
 
 - [ ] GET /api/health → 200
 - [ ] GET /api/songs → 200, paginación correcta
+- [ ] GET /api/songs?search=queen → 200, filtra por nombre o artista
 - [ ] GET /api/songs/1 → 200
 - [ ] GET /api/songs/9999 → 404
 - [ ] POST /api/songs (válido) → 201

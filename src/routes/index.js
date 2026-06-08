@@ -30,4 +30,6 @@ router.delete("/songs/:id/favorites", removeFavorite);
 
 router.get("/favorites", getFavorites);
 
-module.exports = router;
+module.exports = (app) => {
+  app.use("/api", router);
+};

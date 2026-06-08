@@ -3,7 +3,8 @@ const songsService = require("../services/songsService");
 const getSongs = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const result = await songsService.getSongs(page);
+    const search = req.query.search?.toString().trim() || "";
+    const result = await songsService.getSongs(page, search);
 
     res.status(200).json({
       status: "ok",
