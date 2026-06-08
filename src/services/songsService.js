@@ -1,12 +1,22 @@
 const prisma = require("../prisma/prismaClient");
 const { validateSong, checkSongExists } = require("../validations/validateSong");
 
-const getSongs = async (page = 1) => {
+const getSongs = async (page = 1, search = "") => {
   const pageSize = 20;
   const skip = (page - 1) * pageSize;
+  const searchTerm = search.trim();
+  const where = searchTerm
+    ? {
+        OR: [
+          { name: { contains: searchTerm, mode: "insensitive" } },
+          { artist: { contains: searchTerm, mode: "insensitive" } },
+        ],
+      }
+    : {};
 
-  const total = await prisma.song.count();
+  const total = await prisma.song.count({ where });
   const songs = await prisma.song.findMany({
+    where,
     skip,
     take: pageSize,
     include: {
