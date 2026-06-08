@@ -5,28 +5,21 @@ const getSongs = async ({ page = 1, search = "", genre = "" } = {}) => {
   const pageSize = 20;
   const skip = (page - 1) * pageSize;
 
+  const searchTerm = search.trim();
+  const genreTerm = genre.trim();
+
   const where = {};
 
-  if (search.trim()) {
+  if (searchTerm) {
     where.OR = [
-      {
-        name: {
-          contains: search.trim(),
-          mode: "insensitive",
-        },
-      },
-      {
-        artist: {
-          contains: search.trim(),
-          mode: "insensitive",
-        },
-      },
+      { name: { contains: searchTerm, mode: "insensitive" } },
+      { artist: { contains: searchTerm, mode: "insensitive" } },
     ];
   }
 
-  if (genre.trim()) {
+  if (genreTerm) {
     where.genre = {
-      equals: genre.trim(),
+      equals: genreTerm,
       mode: "insensitive",
     };
   }
@@ -55,6 +48,7 @@ const getSongs = async ({ page = 1, search = "", genre = "" } = {}) => {
     },
   };
 };
+
 const getSongById = async (id) => {
   const song = await prisma.song.findUnique({
     where: { id: parseInt(id) },
@@ -128,7 +122,6 @@ const updateSong = async (id, body) => {
     throw error;
   }
 
-  // Verificar si el youtubeId ya existe en otra canción
   if (youtubeId !== song.youtubeId) {
     const existingSong = await checkSongExists(youtubeId);
     if (existingSong) {

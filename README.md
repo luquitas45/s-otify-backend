@@ -222,7 +222,7 @@ GET /api/health
 
 | Método | Ruta | Query Params | Body | Respuesta |
 |--------|------|-------------|------|-----------|
-| `GET` | `/api/songs` | `page` (default: 1) | — | `{ data: Song[], pagination: { page, pageSize, total, hasMore } }` |
+| `GET` | `/api/songs` | `page` (default: 1), `search` | — | `{ data: Song[], pagination: { page, pageSize, total, hasMore } }` |
 | `GET` | `/api/songs/:id` | — | — | `{ data: Song }` (200) |
 | `POST` | `/api/songs` | — | `{ name*, artist*, youtubeId*, genre*, audioUrl* }` | `{ data: Song }` (201) |
 | `PUT` | `/api/songs/:id` | — | `{ name, artist, youtubeId, genre, audioUrl }` | `{ data: Song }` (200) |
@@ -232,6 +232,12 @@ GET /api/health
 
 ```bash
 curl "http://localhost:3000/api/songs?page=1"
+```
+
+#### Ejemplo: Buscar canciones por nombre o artista
+
+```bash
+curl "http://localhost:3000/api/songs?search=queen"
 ```
 
 **Respuesta 200**:
