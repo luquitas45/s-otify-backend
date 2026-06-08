@@ -8,15 +8,12 @@ const app = express();
 app.use(corsMiddleware);
 app.use(express.json());
 
-app.use("/api", route);
+route(app);
 
-
-=======<<<<<<< Updated upstream
 app.get("/error", (req, res, next) => {
   next(new Error("Forced error"));
 });
 
->>>>>>> Stashed changes
 app.use(notFound);
 app.use(errorHandler);
 
