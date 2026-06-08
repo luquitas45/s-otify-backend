@@ -1,12 +1,40 @@
 const prisma = require("../prisma/prismaClient");
 const { validateSong, checkSongExists } = require("../validations/validateSong");
 
-const getSongs = async (page = 1) => {
+const getSongs = async ({ page = 1, search = "", genre = "" } = {}) => {
   const pageSize = 20;
   const skip = (page - 1) * pageSize;
 
-  const total = await prisma.song.count();
+  const where = {};
+
+  if (search.trim()) {
+    where.OR = [
+      {
+        name: {
+          contains: search.trim(),
+          mode: "insensitive",
+        },
+      },
+      {
+        artist: {
+          contains: search.trim(),
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  if (genre.trim()) {
+    where.genre = {
+      equals: genre.trim(),
+      mode: "insensitive",
+    };
+  }
+
+  const total = await prisma.song.count({ where });
+
   const songs = await prisma.song.findMany({
+    where,
     skip,
     take: pageSize,
     include: {
@@ -27,7 +55,6 @@ const getSongs = async (page = 1) => {
     },
   };
 };
-
 const getSongById = async (id) => {
   const song = await prisma.song.findUnique({
     where: { id: parseInt(id) },

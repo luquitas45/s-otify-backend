@@ -29,7 +29,7 @@ const checkFavorite = async (req, res, next) => {
 const addFavorite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.query.userId || "anonymous";
+   const userId = req.body?.userId || req.query.userId || "anonymous";
 
     const song = await prisma.song.findUnique({
       where: { id: parseInt(id) },
@@ -72,7 +72,7 @@ const addFavorite = async (req, res, next) => {
 const removeFavorite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.query.userId || "anonymous";
+    const userId = req.body?.userId || req.query.userId || "anonymous";
 
     const favorite = await prisma.favoriteSong.findUnique({
       where: {
@@ -125,7 +125,7 @@ const getFavorites = async (req, res, next) => {
 
     res.status(200).json({
       status: "ok",
-      data: favorites,
+      data: favorites.map((favorite) => favorite.song),
       pagination: {
         page,
         pageSize,
