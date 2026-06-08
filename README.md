@@ -10,7 +10,7 @@ API REST para S-otify, una Single Page Application de música desarrollada con R
 |--------|--------|-----|
 | Lucas Ortiz | [5561] | PM / Scrum Master |
 | Gaston Berhau | [completar] | Desarrollador |
-| Fabrizio Brollo | [completar] | Desarrollador |
+| Fabrizio Brollo | [5532] | Desarrollador |
 | Valentin Bustamante | [completar] | Desarrollador |
 
 ---
