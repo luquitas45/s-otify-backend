@@ -1,32 +1,14 @@
-const prisma = require("../prisma/prismaClient");
+const songsService = require("../services/songsService");
 
 const getSongs = async (req, res, next) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const pageSize = 20;
-    const skip = (page - 1) * pageSize;
-
-    const total = await prisma.song.count();
-    const songs = await prisma.song.findMany({
-      skip,
-      take: pageSize,
-      include: {
-        favorites: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const result = await songsService.getSongs(page);
 
     res.status(200).json({
       status: "ok",
-      data: songs,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        hasMore: skip + pageSize < total,
-      },
+      data: result.songs,
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -36,16 +18,7 @@ const getSongs = async (req, res, next) => {
 const getSongById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const song = await prisma.song.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        favorites: true,
-      },
-    });
-
-    if (!song) {
-      return res.status(404).json({ error: "Canción no encontrada" });
-    }
+    const song = await songsService.getSongById(id);
 
     res.status(200).json({
       status: "ok",
@@ -58,48 +31,7 @@ const getSongById = async (req, res, next) => {
 
 const createSong = async (req, res, next) => {
   try {
-    const errors = validateSong(req.body);
-    if (errors.length > 0) {
-      return res.status(400).json({
-        error: "Datos inválidos",
-        details: errors,
-      });
-    }
-
-    const {
-  name,
-  artist,
-  genre,
-  youtubeId,
-  audioUrl,
-  image,
-  album,
-  duration,
-} = req.body;
-
-    const existingSong = await prisma.song.findUnique({
-      where: { youtubeId },
-    });
-
-    if (existingSong) {
-      return res.status(400).json({
-        error: "Datos inválidos",
-        details: [{ field: "youtubeId", message: "Esta canción ya existe" }],
-      });
-    }
-
-    const song = await prisma.song.create({
-data: {
-  name,
-  artist,
-  genre,
-  youtubeId,
-  audioUrl,
-  image,
-  album,
-  duration,
-},
-    });
+    const song = await songsService.createSong(req.body);
 
     res.status(201).json({
       status: "ok",
@@ -113,50 +45,11 @@ data: {
 const updateSong = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const errors = validateSong(req.body);
-    if (errors.length > 0) {
-      return res.status(400).json({
-        error: "Datos inválidos",
-        details: errors,
-      });
-    }
-
-    const {
-  name,
-  artist,
-  genre,
-  youtubeId,
-  audioUrl,
-  image,
-  album,
-  duration,
-} = req.body;
-
-    const song = await prisma.song.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!song) {
-      return res.status(404).json({ error: "Canción no encontrada" });
-    }
-
-    const updatedSong = await prisma.song.update({
-      where: { id: parseInt(id) },
-      data: {
-        name,
-        artist,
-        genre,
-        youtubeId,
-        audioUrl,
-        image,
-        album,
-        duration,
-      },
-    });
+    const song = await songsService.updateSong(id, req.body);
 
     res.status(200).json({
       status: "ok",
-      data: updatedSong,
+      data: song,
     });
   } catch (error) {
     next(error);
@@ -166,64 +59,15 @@ const updateSong = async (req, res, next) => {
 const deleteSong = async (req, res, next) => {
   try {
     const { id } = req.params;
-
-    const song = await prisma.song.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!song) {
-      return res.status(404).json({ error: "Canción no encontrada" });
-    }
-
-    await prisma.song.delete({
-      where: { id: parseInt(id) },
-    });
+    const result = await songsService.deleteSong(id);
 
     res.status(200).json({
       status: "ok",
-      message: "Canción eliminada",
+      message: result.message,
     });
   } catch (error) {
     next(error);
   }
-};
-
-const validateSong = (body) => {
-  const errors = [];
-
-  if (!body || typeof body !== "object") {
-    errors.push({ field: "body", message: "El body no puede estar vacío" });
-    return errors;
-  }
-
-  if (!body.name || body.name.toString().trim() === "") {
-    errors.push({ field: "name", message: "El nombre es obligatorio" });
-  }
-
-  if (!body.artist || body.artist.toString().trim() === "") {
-    errors.push({ field: "artist", message: "El artista es obligatorio" });
-  }
-
-  if (!body.genre || body.genre.toString().trim() === "") {
-    errors.push({ field: "genre", message: "El género es obligatorio" });
-  }
-
-  if (!body.youtubeId || body.youtubeId.toString().trim() === "") {
-    errors.push({ field: "youtubeId", message: "El ID de YouTube es obligatorio" });
-  }
-
-  if (!body.image || body.image.toString().trim() === "") {
-  errors.push({
-    field: "image",
-    message: "La imagen es obligatoria",
-  });
-}
-
-  if (!body.audioUrl || body.audioUrl.toString().trim() === "") {
-    errors.push({ field: "audioUrl", message: "La URL de audio es obligatoria" });
-  }
-
-  return errors;
 };
 
 module.exports = {
