@@ -1,10 +1,14 @@
-/*
-Manejo errores forzados o errores que lleguen con next(error)
-*/
+
 function errorHandler(err, req, res, next) {
-  res.status(500).json({
-    error: "Error interno del servidor",
-    message: err.message,
-  });
+  const status = err.statusCode || 500;
+  const response = {
+    error: status === 500 ? "Error interno del servidor" : err.message,
+  };
+
+  if (err.details) {
+    response.details = err.details;
+  }
+
+  res.status(status).json(response);
 }
 module.exports = errorHandler;

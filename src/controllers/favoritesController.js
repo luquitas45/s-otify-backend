@@ -1,24 +1,16 @@
-const prisma = require("../prisma/prismaClient");
+const favoritesService = require("../services/favoritesService");
 
 const checkFavorite = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.query.userId || "anonymous";
-
-    const favorite = await prisma.favoriteSong.findUnique({
-      where: {
-        userId_songId: {
-          userId,
-          songId: parseInt(id),
-        },
-      },
-    });
+    const isFavorite = await favoritesService.checkFavorite({ userId, songId: id });
 
     res.status(200).json({
       status: "ok",
       data: {
         songId: parseInt(id),
-        isFavorite: !!favorite,
+        isFavorite,
       },
     });
   } catch (error) {
@@ -29,36 +21,8 @@ const checkFavorite = async (req, res, next) => {
 const addFavorite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.query.userId || "anonymous";
-
-    const song = await prisma.song.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!song) {
-      return res.status(404).json({ error: "Canción no encontrada" });
-    }
-
-    const existingFavorite = await prisma.favoriteSong.findUnique({
-      where: {
-        userId_songId: {
-          userId,
-          songId: parseInt(id),
-        },
-      },
-    });
-
-    if (existingFavorite) {
-      return res.status(409).json({
-        error: "Datos inválidos",
-        details: [{ field: "songId", message: "Esta canción ya está en favoritos" }],
-      });
-    }
-
-    const favorite = await prisma.favoriteSong.create({
-      data: { userId, songId: parseInt(id) },
-      include: { song: true },
-    });
+    const userId = req.body?.userId || req.query.userId || "anonymous";
+    const favorite = await favoritesService.addFavorite({ userId, songId: id });
 
     res.status(201).json({
       status: "ok",
@@ -72,33 +36,12 @@ const addFavorite = async (req, res, next) => {
 const removeFavorite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const userId = req.query.userId || "anonymous";
-
-    const favorite = await prisma.favoriteSong.findUnique({
-      where: {
-        userId_songId: {
-          userId,
-          songId: parseInt(id),
-        },
-      },
-    });
-
-    if (!favorite) {
-      return res.status(404).json({ error: "Favorito no encontrado" });
-    }
-
-    await prisma.favoriteSong.delete({
-      where: {
-        userId_songId: {
-          userId,
-          songId: parseInt(id),
-        },
-      },
-    });
+    const userId = req.body?.userId || req.query.userId || "anonymous";
+    const result = await favoritesService.removeFavorite({ userId, songId: id });
 
     res.status(200).json({
       status: "ok",
-      message: "Favorito eliminado",
+      message: result.message,
     });
   } catch (error) {
     next(error);
@@ -108,30 +51,13 @@ const removeFavorite = async (req, res, next) => {
 const getFavorites = async (req, res, next) => {
   try {
     const userId = req.query.userId || "anonymous";
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const pageSize = 20;
-    const skip = (page - 1) * pageSize;
-
-    const total = await prisma.favoriteSong.count({
-      where: { userId },
-    });
-    const favorites = await prisma.favoriteSong.findMany({
-      where: { userId },
-      skip,
-      take: pageSize,
-      include: { song: true },
-      orderBy: { createdAt: "desc" },
-    });
+    const page = req.query.page;
+    const result = await favoritesService.getFavorites({ userId, page });
 
     res.status(200).json({
       status: "ok",
-      data: favorites,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        hasMore: skip + pageSize < total,
-      },
+      data: result.songs,
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);

@@ -2,13 +2,27 @@ const prisma = require("../prisma/prismaClient");
 const { Prisma } = require("@prisma/client");
 const { validateSong, checkSongExists } = require("../validations/validateSong");
 
-const getSongs = async (page = 1, search = "") => {
+const getSongs = async ({ page = 1, search = "", genre = "" } = {}) => {
   const pageSize = 20;
   const skip = (page - 1) * pageSize;
+
   const searchTerm = search.trim();
-  const likeSearch = `%${searchTerm}%`;
-  const where = searchTerm
-    ? Prisma.sql`WHERE s."name" ILIKE ${likeSearch} OR s."artist" ILIKE ${likeSearch}`
+  const genreTerm = genre.trim();
+  const conditions = [];
+
+  if (searchTerm) {
+    const likeSearch = `%${searchTerm}%`;
+    conditions.push(
+      Prisma.sql`(s."name" ILIKE ${likeSearch} OR s."artist" ILIKE ${likeSearch})`
+    );
+  }
+
+  if (genreTerm) {
+    conditions.push(Prisma.sql`LOWER(s."genre") = LOWER(${genreTerm})`);
+  }
+
+  const where = conditions.length
+    ? Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`
     : Prisma.empty;
 
   const [result] = await prisma.$queryRaw`
@@ -149,7 +163,6 @@ const updateSong = async (id, body) => {
     throw error;
   }
 
-  // Verificar si el youtubeId ya existe en otra canción
   if (youtubeId !== song.youtubeId) {
     const existingSong = await checkSongExists(youtubeId);
     if (existingSong) {
