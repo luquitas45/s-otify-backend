@@ -20,20 +20,34 @@ model Song {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  favorites FavoriteSong[]
+  favorites FavoriteSong[] @relation("SongFavorites")
 
   @@index([genre])
 }
 
 model FavoriteSong {
-  id        Int     @id @default(autoincrement())
-  userId    String  @default("anonymous")
+  id        Int      @id @default(autoincrement())
+  userId    String  
   songId    Int
-  song      Song    @relation(fields: [songId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserFavorites", fields: [userId], references: [id], onDelete: Cascade)
+  song      Song     @relation("SongFavorites", fields: [songId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([userId, songId])
   @@index([userId])
   @@index([songId])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites FavoriteSong[] @relation("UserFavorites")
+
+  @@index([email])
 }

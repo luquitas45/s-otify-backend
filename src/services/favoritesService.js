@@ -3,6 +3,19 @@ const prisma = require("../prisma/prismaClient");
 const DEFAULT_USER = "anonymous";
 const PAGE_SIZE = 20;
 
+const ensureUser = async (userId = DEFAULT_USER) => {
+  return prisma.user.upsert({
+    where: { id: userId },
+    update: {},
+    create: {
+      id: userId,
+      email: userId === DEFAULT_USER ? "anonymous@s-otify.local" : `${userId}@s-otify.local`,
+      name: userId === DEFAULT_USER ? "Anonymous" : userId,
+      password: "changeme",
+    },
+  });
+};
+
 const checkFavorite = async ({ userId = DEFAULT_USER, songId }) => {
   const favorite = await prisma.favoriteSong.findUnique({
     where: {
@@ -17,6 +30,8 @@ const checkFavorite = async ({ userId = DEFAULT_USER, songId }) => {
 };
 
 const addFavorite = async ({ userId = DEFAULT_USER, songId }) => {
+  await ensureUser(userId);
+
   const song = await prisma.song.findUnique({
     where: { id: parseInt(songId) },
   });
