@@ -1,3 +1,7 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const prisma = require("../prisma/prismaClient");
+
 const register = async ({name, email, password}) => {
     const existingUser = await prisma.user.findUnique({
         where: { email: email },
@@ -34,14 +38,7 @@ const login = async ({email, password}) => {
     }   
 
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    return {
-        token,
-        user: {
-            id: user.id,
-            name: user.name,
-            email: user.email
-        }
-    }
+
     return { token, user: { id: user.id, name: user.name, email: user.email } };
 }
 

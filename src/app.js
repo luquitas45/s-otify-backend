@@ -2,6 +2,7 @@ const express = require("express");
 const route = require("./routes");
 const corsMiddleware = require("./middlewares/cors");
 const notFound = require("./middlewares/notFound");
+const dotenv = require("dotenv");
 const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();

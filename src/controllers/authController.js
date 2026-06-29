@@ -14,20 +14,31 @@ const register = async (req, res) => {
     }
 }
 
-const login = async (req, res) => {
-    const { email, password } = req.body;
 
-    if(email && password) {
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email y contraseña son requeridos",
+            });
+        }
+
         const user = await authService.login({ email, password });
-        res.status(200).json({
+
+        return res.status(200).json({
             status: "ok",
             data: user,
         });
-    }else{
-        res.status(400).json({ error: "Email y contraseña son requeridos" });
-    }   
+    } catch (error) {
+        return res.status(error.status || 500).json({
+            message: error.message || "Error interno del servidor",
+        });
+    }
+};
 
-}
+
 
 const logout = (req, res) => {
   res.clearCookie("token", {
