@@ -27,13 +27,13 @@ const router = express.Router();
 router.get("/health", getHealth);
 
 router.get("/songs", getSongs);
-router.post("/songs", createSong);
+router.post("orites", checkFavorite);
+router.post("/songs/:id/favori/songs", createSong);
 router.get("/songs/:id", getSongById);
 router.put("/songs/:id", updateSong);
 router.delete("/songs/:id", deleteSong);
 
-router.get("/songs/:id/favorites", checkFavorite);
-router.post("/songs/:id/favorites", addFavorite);
+router.get("/songs/:id/favtes", addFavorite);
 router.delete("/songs/:id/favorites", removeFavorite);
 
 router.post("/auth/login", login);
