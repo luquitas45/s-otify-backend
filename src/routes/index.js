@@ -1,4 +1,5 @@
 const express = require("express");
+const authMiddleware = require("../middlewares/authMiddleware");
 const { getHealth } = require("../controllers/healthController");
 const {
   getSongs,
@@ -8,7 +9,6 @@ const {
   deleteSong,
 } = require("../controllers/songsController");
 const {
-  checkFavorite,
   addFavorite,
   removeFavorite,
   getFavorites,
@@ -17,31 +17,27 @@ const {
   login,
   register,
   logout,
-  me
+  me,
 } = require("../controllers/authController");
-
-
 
 const router = express.Router();
 
 router.get("/health", getHealth);
 
 router.get("/songs", getSongs);
-router.post("orites", checkFavorite);
-router.post("/songs/:id/favori/songs", createSong);
+router.post("/songs", createSong);
 router.get("/songs/:id", getSongById);
 router.put("/songs/:id", updateSong);
 router.delete("/songs/:id", deleteSong);
 
-router.get("/songs/:id/favtes", addFavorite);
-router.delete("/songs/:id/favorites", removeFavorite);
+router.get("/favorites", authMiddleware, getFavorites);
+router.post("/favorites/:id", authMiddleware, addFavorite);
+router.delete("/favorites/:id", authMiddleware, removeFavorite);
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
 router.post("/auth/logout", logout);
-router.get("/auth/me", me);
-
-router.get("/favorites", getFavorites);
+router.get("/auth/me", authMiddleware, me);
 
 module.exports = (app) => {
   app.use("/api", router);
