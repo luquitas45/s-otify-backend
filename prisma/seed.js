@@ -202,6 +202,16 @@ async function main() {
     console.log("Limpiando datos previos...");
     await prisma.favoriteSong.deleteMany({});
     await prisma.song.deleteMany({});
+    await prisma.user.deleteMany({});
+
+    await prisma.user.create({
+      data: {
+        id: "anonymous",
+        email: "anonymous@s-otify.local",
+        name: "Anonymous",
+        password: "changeme",
+      },
+    });
 
     console.log(`Creando ${songs.length} canciones...`);
 

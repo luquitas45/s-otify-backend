@@ -13,6 +13,14 @@ const {
   removeFavorite,
   getFavorites,
 } = require("../controllers/favoritesController");
+const {
+  login,
+  register,
+  logout,
+  me
+} = require("../controllers/authController");
+
+
 
 const router = express.Router();
 
@@ -27,6 +35,11 @@ router.delete("/songs/:id", deleteSong);
 router.get("/songs/:id/favorites", checkFavorite);
 router.post("/songs/:id/favorites", addFavorite);
 router.delete("/songs/:id/favorites", removeFavorite);
+
+router.post("/auth/login", login);
+router.post("/auth/register", register);
+router.post("/auth/logout", logout);
+router.get("/auth/me", me);
 
 router.get("/favorites", getFavorites);
 

@@ -1,6 +1,9 @@
 const prisma = require("../prisma/prismaClient");
 const { Prisma } = require("@prisma/client");
-const { validateSong, checkSongExists } = require("../validations/validateSong");
+const {
+  validateSong,
+  checkSongExists,
+} = require("../validations/validateSong");
 
 const getSongs = async ({ page = 1, search = "", genre = "" } = {}) => {
   const pageSize = 20;
@@ -13,7 +16,7 @@ const getSongs = async ({ page = 1, search = "", genre = "" } = {}) => {
   if (searchTerm) {
     const likeSearch = `%${searchTerm}%`;
     conditions.push(
-      Prisma.sql`(s."name" ILIKE ${likeSearch} OR s."artist" ILIKE ${likeSearch})`
+      Prisma.sql`(s."name" ILIKE ${likeSearch} OR s."artist" ILIKE ${likeSearch})`,
     );
   }
 
@@ -116,7 +119,8 @@ const createSong = async (body) => {
     throw error;
   }
 
-  const { name, artist, genre, youtubeId, audioUrl, image, album, duration } = body;
+  const { name, artist, genre, youtubeId, audioUrl, image, album, duration } =
+    body;
 
   const existingSong = await checkSongExists(youtubeId);
   if (existingSong) {
@@ -151,7 +155,8 @@ const updateSong = async (id, body) => {
     throw error;
   }
 
-  const { name, artist, genre, youtubeId, audioUrl, image, album, duration } = body;
+  const { name, artist, genre, youtubeId, audioUrl, image, album, duration } =
+    body;
 
   const song = await prisma.song.findUnique({
     where: { id: parseInt(id) },
@@ -168,7 +173,9 @@ const updateSong = async (id, body) => {
     if (existingSong) {
       const error = new Error("Datos inválidos");
       error.statusCode = 400;
-      error.details = [{ field: "youtubeId", message: "Esta canción ya existe" }];
+      error.details = [
+        { field: "youtubeId", message: "Esta canción ya existe" },
+      ];
       throw error;
     }
   }
