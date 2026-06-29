@@ -1,4 +1,5 @@
 const express = require("express");
+const authMiddleware = require("../middlewares/authMiddleware");
 const { getHealth } = require("../controllers/healthController");
 const {
   getSongs,
@@ -17,10 +18,8 @@ const {
   login,
   register,
   logout,
-  me
+  me,
 } = require("../controllers/authController");
-
-
 
 const router = express.Router();
 
@@ -39,7 +38,7 @@ router.delete("/songs/:id/favorites", removeFavorite);
 router.post("/auth/login", login);
 router.post("/auth/register", register);
 router.post("/auth/logout", logout);
-router.get("/auth/me", me);
+router.get("/auth/me", authMiddleware, me);
 
 router.get("/favorites", getFavorites);
 
