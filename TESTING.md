@@ -1,454 +1,362 @@
-# 🧪 TESTING - 9 ENDPOINTS API S-OTIFY BACKEND
+# 🧪 Testing - S-otify
 
-## Checklist de Testing Completo
-
-Requisito de **T-25**: Todos los endpoints verificados y sus HTTP codes correctos. Sin errores 500 inesperados.
+Este documento resume las verificaciones realizadas sobre el frontend y backend del proyecto S-otify.
 
 ---
 
-## 📋 Endpoints a Probar
+# Frontend
 
-### 1. GET `/api/health` - Health Check
-**Descripción**: Verificar que la API está funcionando
+## Tecnologías
+
+- Vitest
+- React Testing Library
+- jest-dom
+- user-event
+- jsdom
+
+---
+
+## Ejecutar tests
+
+Modo interactivo
 
 ```bash
-curl -X GET http://localhost:3000/api/health
+npm run test
 ```
 
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "message": "API funcionando correctamente"
-}
-```
-
-**Checklist**:
-- [ ] Responde con código 200
-- [ ] Estructura JSON correcta
-
----
-
-### 2. GET `/api/songs` - Listar canciones (paginadas)
-**Descripción**: Obtener lista de canciones con paginación (20 por página)
+Modo CI
 
 ```bash
-# Página 1 (default)
-curl -X GET http://localhost:3000/api/songs
-
-# Página específica
-curl -X GET "http://localhost:3000/api/songs?page=2"
-
-# Buscar por nombre o artista
-curl -X GET "http://localhost:3000/api/songs?search=queen"
-
-# Página inexistente
-curl -X GET "http://localhost:3000/api/songs?page=999"
+npm run test:run
 ```
 
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "data": [
-    {
-      "id": 1,
-      "name": "Buenos Tiempos",
-      "artist": "Dillom",
-      "genre": "Trap",
-      "youtubeId": "kYvM-iR6FpQ",
-      "image": "https://placehold.co/600x600/FF6B35/white?text=Trap",
-      "album": "Trap Album 1",
-      "duration": "3:45",
-      "audioUrl": "...",
-      "createdAt": "...",
-      "updatedAt": "...",
-      "favorites": []
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "pageSize": 20,
-    "total": 30,
-    "hasMore": true
-  }
-}
-```
-
-**Checklist**:
-- [ ] Responde con código 200
-- [ ] Retorna 20 canciones máximo por página
-- [ ] Incluye paginación (page, pageSize, total, hasMore)
-- [ ] Página 999 retorna array vacío pero hasMore=false
-- [ ] Todos los campos presentes (image, album, duration)
-
----
-
-### 3. GET `/api/songs/:id` - Obtener canción por ID
+Build de producción
 
 ```bash
-# ID válido
-curl -X GET http://localhost:3000/api/songs/1
-
-# ID inválido
-curl -X GET http://localhost:3000/api/songs/9999
+npm run build
 ```
-
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "data": {
-    "id": 1,
-    "name": "Buenos Tiempos",
-    "artist": "Dillom",
-    "genre": "Trap",
-    "youtubeId": "kYvM-iR6FpQ",
-    "image": "...",
-    "album": "...",
-    "duration": "...",
-    "audioUrl": "...",
-    "createdAt": "...",
-    "updatedAt": "...",
-    "favorites": []
-  }
-}
-```
-
-**Respuesta esperada (404)**:
-```json
-{
-  "error": "Canción no encontrada"
-}
-```
-
-**Checklist**:
-- [ ] ID válido → Responde 200 con canción
-- [ ] ID inexistente → Responde 404
-- [ ] Todos los campos presentes
 
 ---
 
-### 4. POST `/api/songs` - Crear canción (válido)
+## Componentes testeados
+
+### Header
+
+- Renderizado
+- Cambio de idioma
+- Búsqueda
+- Apertura del panel de usuario
+- Carga de géneros
+
+---
+
+### Home
+
+- Carga inicial
+- Búsqueda
+- Estados de carga
+- Estados vacíos
+- Retry
+- Infinite Scroll
+
+---
+
+### SongCard
+
+- Renderizado
+- Navegación
+- Información mostrada
+
+---
+
+### SongDetails
+
+- Obtención por ID
+- Reproducción
+- Favoritos
+- Manejo de errores
+
+---
+
+### Player
+
+- Renderizado
+- Selección de canción
+- Reproducción
+- Estados vacíos
+
+---
+
+### Footer
+
+- Renderizado
+- Información del equipo
+
+---
+
+### LayoutShell
+
+- Layout general
+- Sidebar
+- Header
+- Footer
+
+---
+
+### AsyncState
+
+- Loading
+- Error
+- Empty
+- Retry
+
+---
+
+### Hook useAsyncStatus
+
+- Loading
+- Error
+- Ejecución correcta
+
+---
+
+## Resultado esperado
+
+```text
+Test Files: 9 passed
+Tests: 34 passed
+```
+
+---
+
+# Backend
+
+## Ejecutar servidor
 
 ```bash
-curl -X POST http://localhost:3000/api/songs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Song",
-    "artist": "Test Artist",
-    "genre": "Rock",
-    "youtubeId": "abcDEF123xy",
-    "image": "https://placehold.co/600x600/CC0000/white?text=Rock",
-    "album": "Test Album",
-    "duration": "3:30",
-    "audioUrl": "https://example.com/audio.mp3"
-  }'
+npm run dev
 ```
-
-**Respuesta esperada (201)**:
-```json
-{
-  "status": "ok",
-  "data": {
-    "id": 31,
-    "name": "Test Song",
-    "artist": "Test Artist",
-    "genre": "Rock",
-    "youtubeId": "abcDEF123xy",
-    "image": "...",
-    "album": "...",
-    "duration": "...",
-    "audioUrl": "...",
-    "createdAt": "...",
-    "updatedAt": "..."
-  }
-}
-```
-
-**Checklist**:
-- [ ] Datos válidos → Responde 201
-- [ ] Nueva canción se crea correctamente
-- [ ] Incluye todos los campos
 
 ---
 
-### 5. POST `/api/songs` - Crear canción (inválido)
+# Endpoints testeados
 
-```bash
-# Body vacío
-curl -X POST http://localhost:3000/api/songs \
-  -H "Content-Type: application/json" \
-  -d '{}'
+## Health
 
-# Campos faltantes
-curl -X POST http://localhost:3000/api/songs \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test"}'
+GET
 
-# Campo vacío
-curl -X POST http://localhost:3000/api/songs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "",
-    "artist": "Artist",
-    "genre": "Rock",
-    "youtubeId": "abcDEF123xy",
-    "image": "url",
-    "album": "Album",
-    "duration": "3:30",
-    "audioUrl": "url"
-  }'
 ```
-
-**Respuesta esperada (400)**:
-```json
-{
-  "error": "Datos inválidos",
-  "details": [
-    {
-      "field": "name",
-      "message": "El nombre es obligatorio"
-    }
-  ]
-}
+/api/health
 ```
-
-**Checklist**:
-- [ ] Body vacío → Responde 400
-- [ ] Campos faltantes → Responde 400
-- [ ] Strings vacíos → Responde 400
-- [ ] Mensaje de error claro
 
 ---
 
-### 6. PUT `/api/songs/:id` - Actualizar canción (válido)
+## Auth
 
-```bash
-curl -X PUT http://localhost:3000/api/songs/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Updated Name",
-    "artist": "Updated Artist",
-    "genre": "Rock",
-    "youtubeId": "kYvM-iR6FpQ",
-    "image": "https://...",
-    "album": "Updated Album",
-    "duration": "4:00",
-    "audioUrl": "https://..."
-  }'
+POST
+
+```
+/api/auth/register
 ```
 
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "data": {
-    "id": 1,
-    "name": "Updated Name",
-    "artist": "Updated Artist",
-    ...
-  }
-}
+POST
+
+```
+/api/auth/login
 ```
 
-**Checklist**:
-- [ ] ID válido → Responde 200
-- [ ] Canción se actualiza correctamente
-- [ ] updatedAt se modifica
+GET
+
+```
+/api/auth/me
+```
 
 ---
 
-### 7. PUT `/api/songs/:id` - Actualizar canción (ID inválido)
+## Songs
 
-```bash
-curl -X PUT http://localhost:3000/api/songs/9999 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Updated",
-    "artist": "Artist",
-    "genre": "Rock",
-    "youtubeId": "kYvM-iR6FpQ",
-    "image": "url",
-    "album": "Album",
-    "duration": "3:30",
-    "audioUrl": "url"
-  }'
+GET
+
+```
+/api/songs
 ```
 
-**Respuesta esperada (404)**:
-```json
-{
-  "error": "Canción no encontrada"
-}
+GET
+
+```
+/api/songs/:id
 ```
 
-**Checklist**:
-- [ ] ID inexistente → Responde 404
+POST
+
+```
+/api/songs
+```
+
+PUT
+
+```
+/api/songs/:id
+```
+
+DELETE
+
+```
+/api/songs/:id
+```
 
 ---
 
-### 8. DELETE `/api/songs/:id` - Eliminar canción (válido)
+## Favorites
 
-```bash
-curl -X DELETE http://localhost:3000/api/songs/1
+GET
+
+```
+/api/favorites
 ```
 
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "message": "Canción eliminada"
-}
+POST
+
+```
+/api/favorites/:songId
 ```
 
-**Checklist**:
-- [ ] ID válido → Responde 200
-- [ ] Canción se elimina correctamente
-- [ ] GET posterior devuelve 404
+DELETE
+
+```
+/api/favorites/:songId
+```
+
+GET
+
+```
+/api/favorites/:songId
+```
 
 ---
 
-### 9. DELETE `/api/songs/:id` - Eliminar canción (ID inválido)
+# Casos verificados
 
-```bash
-curl -X DELETE http://localhost:3000/api/songs/9999
-```
+## Autenticación
 
-**Respuesta esperada (404)**:
-```json
-{
-  "error": "Canción no encontrada"
-}
-```
-
-**Checklist**:
-- [ ] ID inexistente → Responde 404
+- Registro correcto
+- Login correcto
+- Token JWT válido
+- Usuario autenticado
+- Token inválido
+- Usuario no autenticado
 
 ---
 
-## 🎯 ENDPOINTS DE FAVORITOS (Bonus - 3 adicionales)
+## Canciones
 
-### 10. GET `/api/songs/:id/favorites` - Verificar si es favorito
-
-```bash
-curl -X GET "http://localhost:3000/api/songs/1/favorites"
-```
-
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "data": {
-    "songId": 1,
-    "isFavorite": false
-  }
-}
-```
-
-**Checklist**:
-- [ ] Retorna isFavorite: boolean
-- [ ] Código 200
+- Listado
+- Paginación
+- Búsqueda
+- Obtener por ID
+- Crear
+- Editar
+- Eliminar
+- IDs inexistentes
 
 ---
 
-### 11. POST `/api/songs/:id/favorites` - Agregar a favoritos
+## Favoritos
 
-```bash
-curl -X POST "http://localhost:3000/api/songs/1/favorites"
-```
-
-**Respuesta esperada (201)**:
-```json
-{
-  "status": "ok",
-  "data": {
-    "id": 1,
-    "userId": "anonymous",
-    "songId": 1,
-    "song": {...},
-    "createdAt": "...",
-    "updatedAt": "..."
-  }
-}
-```
-
-**Checklist**:
-- [ ] Primera vez → Responde 201
-- [ ] Segunda vez (duplicado) → Responde 409
-- [ ] Crea registro en FavoriteSong
+- Agregar favorito
+- Eliminar favorito
+- Evitar duplicados
+- Obtener favoritos del usuario
+- Verificar favorito
 
 ---
 
-### 12. DELETE `/api/songs/:id/favorites` - Eliminar de favoritos
+# Códigos HTTP comprobados
 
-```bash
-curl -X DELETE "http://localhost:3000/api/songs/1/favorites"
-```
+| Código | Significado |
+|---------|-------------|
+| 200 | OK |
+| 201 | Created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 404 | Not Found |
+| 409 | Conflict |
 
-**Respuesta esperada (200)**:
-```json
-{
-  "status": "ok",
-  "message": "Favorito eliminado"
-}
-```
-
-**Checklist**:
-- [ ] Favorito existente → Responde 200
-- [ ] Favorito inexistente → Responde 404
+No se detectaron errores **500** durante las pruebas funcionales.
 
 ---
 
-## 📊 Resumen de HTTP Codes
+# Flujo validado
 
-| Código | Escenario |
-|--------|-----------|
-| 200 | GET exitoso, PUT exitoso, DELETE exitoso |
-| 201 | POST exitoso |
-| 400 | Body inválido |
-| 404 | Recurso no encontrado |
-| 409 | Favorito duplicado |
-| 500 | Error del servidor |
-
----
-
-## ✅ Checklist Final
-
-- [ ] GET /api/health → 200
-- [ ] GET /api/songs → 200, paginación correcta
-- [ ] GET /api/songs?search=queen → 200, filtra por nombre o artista
-- [ ] GET /api/songs/1 → 200
-- [ ] GET /api/songs/9999 → 404
-- [ ] POST /api/songs (válido) → 201
-- [ ] POST /api/songs (inválido) → 400
-- [ ] PUT /api/songs/1 → 200
-- [ ] PUT /api/songs/9999 → 404
-- [ ] DELETE /api/songs/1 → 200
-- [ ] DELETE /api/songs/9999 → 404
-- [ ] GET /api/songs/:id/favorites → 200
-- [ ] POST /api/songs/:id/favorites → 201/409
-- [ ] DELETE /api/songs/:id/favorites → 200/404
-- [ ] Sin errores 500 inesperados
-- [ ] Todos los campos presentes en respuestas
-- [ ] userId por defecto es "anonymous"
-
----
-
-## 🚀 Ejecutar Testing Automatizado (Optional)
-
-Se puede crear un script `test.sh` para automatizar estas pruebas:
-
-```bash
-#!/bin/bash
-BASE_URL="http://localhost:3000/api"
-
-echo "Testing GET /health"
-curl -s -w "\nStatus: %{http_code}\n" -X GET $BASE_URL/health
-
-echo "Testing GET /songs"
-curl -s -w "\nStatus: %{http_code}\n" -X GET $BASE_URL/songs
-
-# ... más tests
+```
+Registro
+        │
+        ▼
+Login
+        │
+        ▼
+JWT
+        │
+        ▼
+Frontend autenticado
+        │
+        ▼
+Consultar canciones
+        │
+        ▼
+Agregar favoritos
+        │
+        ▼
+Ver favoritos
+        │
+        ▼
+Cerrar sesión
 ```
 
+---
+
+# Resultado final
+
+## Frontend
+
+✅ Tests automáticos
+
+✅ Build de producción
+
+✅ Navegación
+
+✅ Responsive
+
+✅ Internacionalización
+
+---
+
+## Backend
+
+✅ API funcionando
+
+✅ JWT
+
+✅ Prisma
+
+✅ PostgreSQL
+
+✅ CRUD completo
+
+✅ Favoritos
+
+---
+
+# Estado del proyecto
+
+✅ Frontend validado
+
+✅ Backend validado
+
+✅ Integración Front ↔ Back validada
+
+✅ Build correcta
+
+✅ Tests correctos
+
+✅ Proyecto listo para entrega

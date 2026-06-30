@@ -6,10 +6,11 @@ const env = {
   PORT: process.env.PORT || 3000,
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
   NODE_ENV: process.env.NODE_ENV || "development",
+  JWT_SECRET: process.env.JWT_SECRET,
 };
 
 // Validar que las variables requeridas existan
-const required = ["DATABASE_URL"];
+const required = ["DATABASE_URL", "JWT_SECRET"];
 const missing = required.filter((key) => !env[key]);
 
 if (missing.length > 0) {
